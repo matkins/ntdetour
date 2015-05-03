@@ -5,6 +5,7 @@ var directionsDisplay = new google.maps.DirectionsRenderer();
 var map, startLocation, endLocation, directRouteDuration;
 var directionsCtr = 0;
 var potentialPlaces = [];
+var numPotentialPlaces = 0;
 var allProperties = [];
 var allMarkers = [];
 
@@ -74,18 +75,27 @@ function getDirections(callback){
     directionsService.route(request, function(response, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         potentialPlaces.shift();
+        var progress = (numPotentialPlaces  - potentialPlaces.length) / numPotentialPlaces;
+        $('.progress-bar').css('width', "" + progress * 100 + "%");
         addResult(response, place);
         if(potentialPlaces.length > 0){
-          setTimeout(function(){getDirections(callback)}, 200);
-        } else if (callback){
-          callback(response);
+          setTimeout(function(){getDirections(callback)}, 400);
+        } else {
+          $('.progress').hide();
+          if (callback){
+            callback(response);
+          }
         }
       } else if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
-        setTimeout(function(){getDirections(callback)}, 2000);
+        console.log('OVER_QUERY_LIMIT');
+        setTimeout(function(){getDirections(callback)}, 2500);
       }
     });
-  } else if (callback){
-    callback(); 
+  } else {
+    $('.progress').hide();
+    if (callback){
+      callback(); 
+    }
   }
 }
 
@@ -108,17 +118,20 @@ function addResult(directions, place){
   var resultText = '';
   var durationDiff = 0;
   if(place){
-    durationDiff = Math.round((duration - directRouteDuration) / 60);
+    durationDiff = duration - directRouteDuration;
     resultText += "<strong>" + place.name + "</strong><br>";
-    resultText += durationDiff + " minutes longer"
+    resultText += secondsToTime(durationDiff, true) + " longer"
   } else {
-    resultText += "<strong>" + "Direct route" + "</strong><br>";
-    resultText += Math.round(duration / 60) + " minutes"
+    resultText += "<strong>" + "Direct route" + "</strong> &ndash; ";
+    resultText += secondsToTime(duration) + " &ndash; "
+    resultText  += " (" + Math.round(distance * METERS_TO_MILES) + " miles)";
     directRouteDuration = duration;
   }
   
-  // resultText  += " (" + Math.round(distance * METERS_TO_MILES) + " miles)";
   var result = $("<li class='list-group-item'>" + resultText + "</li>");
+  if(place == null){
+    result.addClass('list-group-item-info');
+  }
   result.data('leg-ratio', legRatio);
   result.data('duration',duration);
   result.on('click', function(){
@@ -150,6 +163,22 @@ function addResult(directions, place){
   // }).each(function(index, el) {
   //   $('#results').append(el);
   // });
+}
+
+function secondsToTime(secs, long)
+{
+    var hours = Math.floor(secs / (60 * 60));
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+   
+    var out = "";
+    if(hours > 0){
+      out += hours;
+      out += long ? (hours == 1 ? " hour " : " hours ") : "hr ";
+    }
+    out += minutes;
+    out += long ? (minutes == 1 ? " minute " : " minutes ") : "min ";
+    return out;
 }
 
 function initialize() {
@@ -201,15 +230,27 @@ function initialize() {
 
         allProperties.results.forEach(function(place){
           var placeLatLng = new google.maps.LatLng(place.la, place.lo);
+
           var distFromMid = distanceBetween(placeLatLng, mid);
-          var totalDistance = distanceBetween(startLocation.geometry.location, placeLatLng) + distanceBetween(placeLatLng, endLocation.geometry.location)
-          if (distFromMid < (crowFliesDist/2)){
-            potentialPlaces.push({place: place, totalDistance: totalDistance});
+          var inTheCircle = distFromMid < (crowFliesDist/2);
+          
+          var distanceFromStart = distanceBetween(startLocation.geometry.location, placeLatLng);
+          var distanceFromEnd = distanceBetween(endLocation.geometry.location, placeLatLng);
+          var totalDistance = distanceFromStart + distanceFromEnd;
+          var notTooMuchExtraMileage = totalDistance < (crowFliesDist * 1.2);
+          
+          var tooCloseToEitherEnd = (distanceFromEnd < (crowFliesDist/3)) || (distanceFromStart < (crowFliesDist/3))
+          
+          if (inTheCircle && notTooMuchExtraMileage && !tooCloseToEitherEnd){
+            potentialPlaces.push({place: place, totalDistance: totalDistance, distanceFromMid: distFromMid});
           }
         });
         potentialPlaces.sort(function(a,b){
-          return a.totalDistance - b.totalDistance;
+          return a.distanceFromMid - b.distanceFromMid;
         });
+        numPotentialPlaces = potentialPlaces.length;
+        $('.progress-bar').css('width', '0%');
+        $('.progress').show();
         getDirections();
       })
     }

@@ -32,7 +32,9 @@ li {
   height: 520px;
   overflow-y:scroll;
 }
-
+.progress {
+  display:none;
+}
 .search-form {
   margin:10px 0px;
 }
