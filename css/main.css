@@ -28,7 +28,7 @@ html, body{
 li {
   cursor:pointer;
 }
-#results {
+.col-right {
   height: 520px;
   overflow-y:scroll;
 }

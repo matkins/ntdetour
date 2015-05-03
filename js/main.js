@@ -138,7 +138,8 @@ function addResult(directions, place){
     directionsDisplay.setDirections(directions);
   });
   
-  if(place && (durationDiff <= (directRouteDuration/2))){
+  // Don't add more than a third of the journey time
+  if(place && (durationDiff <= (directRouteDuration/3))){
     var marker = new google.maps.Marker({
          position: new google.maps.LatLng(place.la, place.lo),
          map: map,
@@ -146,7 +147,7 @@ function addResult(directions, place){
      });
      allMarkers.push(marker);
      $('#results').append(result);
-   } else {
+   } else if (place == null){
      $('#results').append(result);
    }
 
