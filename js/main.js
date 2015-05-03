@@ -175,7 +175,7 @@ function initialize() {
     endLocation = autocompleteEnd.getPlace();
   });
   
-  $.getJSON('../data/all.json', function(data){
+  $.getJSON('./data/all.json', function(data){
     allProperties = data;
   })
   
