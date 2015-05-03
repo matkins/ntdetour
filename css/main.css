@@ -1,0 +1,37 @@
+html, body{
+  height: 100%;
+  margin: 0px;
+  padding: 0px
+}
+#map-canvas {
+  height:520px;
+  width:100%;
+}
+
+.pac-input {
+  background-color: #fff;
+  font-weight: 300;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.pac-input:focus {
+  border-color: #4d90fe;
+} 
+
+.pac-container {
+  font-family: Roboto;
+}
+li {
+  cursor:pointer;
+}
+#results {
+  height: 520px;
+  overflow-y:scroll;
+}
+
+.search-form {
+  padding:10px 0px;
+  border-bottom: 1px solid #ccc;
+  margin:10px 0px;
+}
