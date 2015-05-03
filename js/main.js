@@ -6,6 +6,7 @@ var map, startLocation, endLocation, directRouteDuration;
 var directionsCtr = 0;
 var potentialPlaces = [];
 var allProperties = [];
+var allMarkers = [];
 
 function midPoint(point1, point2){
   var lat1 = point1.lat();
@@ -59,7 +60,7 @@ function toDeg(val){
 
 function getDirections(callback){
   if(potentialPlaces.length > 0){
-    var place = potentialPlaces.shift();
+    var place = potentialPlaces[0].place;
     var request = {
       origin: startLocation.geometry.location,
       destination: endLocation.geometry.location,
@@ -72,7 +73,7 @@ function getDirections(callback){
     }
     directionsService.route(request, function(response, status) {
       if (status == google.maps.DirectionsStatus.OK) {
-        console.log(status);
+        potentialPlaces.shift();
         addResult(response, place);
         if(potentialPlaces.length > 0){
           setTimeout(function(){getDirections(callback)}, 200);
@@ -80,7 +81,6 @@ function getDirections(callback){
           callback(response);
         }
       } else if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
-        potentialPlaces.push(place);
         setTimeout(function(){getDirections(callback)}, 2000);
       }
     });
@@ -117,7 +117,6 @@ function addResult(directions, place){
     directRouteDuration = duration;
   }
   
-  resultText += " " + legRatio;
   // resultText  += " (" + Math.round(distance * METERS_TO_MILES) + " miles)";
   var result = $("<li class='list-group-item'>" + resultText + "</li>");
   result.data('leg-ratio', legRatio);
@@ -126,33 +125,39 @@ function addResult(directions, place){
     directionsDisplay.setDirections(directions);
   });
   
-  if(place && (durationDiff <= 60) && (legRatio > 0.5)){
+  if(place && (durationDiff <= (directRouteDuration/2))){
     var marker = new google.maps.Marker({
          position: new google.maps.LatLng(place.la, place.lo),
          map: map,
          title: place.name
      });
+     allMarkers.push(marker);
+     $('#results').append(result);
+   } else {
      $('#results').append(result);
    }
 
   // Sort by extra duration
-  // $('#results').find("li").detach().sort(function(a, b) {
-  //   return($(a).data('duration') - $(b).data('duration'));
-  // }).each(function(index, el) {
-  //   $('#results').append(el);
-  // });
-  
-  // Sort by leg ratio
   $('#results').find("li").detach().sort(function(a, b) {
-    return($(b).data('leg-ratio') - $(a).data('leg-ratio'));
+    return($(a).data('duration') - $(b).data('duration'));
   }).each(function(index, el) {
     $('#results').append(el);
   });
+  
+  // Sort by leg ratio
+  // $('#results').find("li").detach().sort(function(a, b) {
+  //   return($(b).data('leg-ratio') - $(a).data('leg-ratio'));
+  // }).each(function(index, el) {
+  //   $('#results').append(el);
+  // });
 }
 
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(54.96175206818404,-4.454484374999992),
+    streetViewControl: false,
+    panControl: false,
+    mapTypeControl: false,
     zoom: 5
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
@@ -183,18 +188,27 @@ function initialize() {
     e.preventDefault();
     if (startLocation && endLocation){
       $('#results').html('');
-      potentialPlaces = [null];
-      // Get most direct route without stopping
+      for (var i = 0; i < allMarkers.length; i++) {
+        allMarkers[i].setMap(map);
+      }
+      var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
+      var crowFliesDist = distanceBetween(startLocation.geometry.location, endLocation.geometry.location);
+      potentialPlaces = [{place:null, totalDistance:crowFliesDist}];
+      
+      // Get most direct route without stop
       getDirections(function(directDirections){
         directionsDisplay.setDirections(directDirections);
-        var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
-        var radius = distanceBetween(startLocation.geometry.location, mid);
+
         allProperties.results.forEach(function(place){
-          var latLng = new google.maps.LatLng(place.la, place.lo);
-          var dist = distanceBetween(latLng, mid);
-          if (dist < radius){
-            potentialPlaces.push(place);
+          var placeLatLng = new google.maps.LatLng(place.la, place.lo);
+          var distFromMid = distanceBetween(placeLatLng, mid);
+          var totalDistance = distanceBetween(startLocation.geometry.location, placeLatLng) + distanceBetween(placeLatLng, endLocation.geometry.location)
+          if (distFromMid < (crowFliesDist/2)){
+            potentialPlaces.push({place: place, totalDistance: totalDistance});
           }
+        });
+        potentialPlaces.sort(function(a,b){
+          return a.totalDistance - b.totalDistance;
         });
         getDirections();
       })
