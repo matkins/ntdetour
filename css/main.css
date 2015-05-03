@@ -8,11 +8,14 @@ html, body{
   width:100%;
 }
 
-.pac-input {
-  background-color: #fff;
-  font-weight: 300;
+.form-inline .pac-input {
   text-overflow: ellipsis;
-  width: 100%;
+  width: 224px;
+}
+
+.form-inline a {
+  margin-left: 10px;
+  padding:6px 24px;
 }
 
 .pac-input:focus {
@@ -31,7 +34,9 @@ li {
 }
 
 .search-form {
-  padding:10px 0px;
-  border-bottom: 1px solid #ccc;
   margin:10px 0px;
+}
+
+.search-form label {
+  font-weight: normal;
 }
