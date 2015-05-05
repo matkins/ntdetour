@@ -219,7 +219,7 @@ function initialize() {
     if (startLocation && endLocation){
       $('#results').html('');
       for (var i = 0; i < allMarkers.length; i++) {
-        allMarkers[i].setMap(map);
+        allMarkers[i].setMap(null);
       }
       var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
       var crowFliesDist = distanceBetween(startLocation.geometry.location, endLocation.geometry.location);
