@@ -135,6 +135,7 @@ function addResult(directions, place){
   result.data('leg-ratio', legRatio);
   result.data('duration',duration);
   result.on('click', function(){
+    directionsDisplay.setOptions({markerOptions: {zIndex: google.maps.Marker.MAX_ZINDEX + 1}})
     directionsDisplay.setDirections(directions);
   });
   
