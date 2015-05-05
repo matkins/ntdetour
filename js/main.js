@@ -2,7 +2,7 @@ var METERS_TO_MILES = 0.000621371192;
 
 var directionsService = new google.maps.DirectionsService();
 var directionsDisplay = new google.maps.DirectionsRenderer();
-var map, startLocation, endLocation, directRouteDuration, infoWindow;
+var map, startLocation, endLocation, directRouteDuration, infoWindow, maxDurationDiff;
 var directionsCtr = 0;
 var potentialPlaces = [];
 var numPotentialPlaces = 0;
@@ -47,6 +47,26 @@ function distanceBetween(point1, point2)
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
   var d = R * c;
   return d;
+}
+
+
+function infoWindowContent(place){
+  var info = $("<div id='infowindow'></div>");
+      
+       var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
+      
+       var content = ""
+       content += "<h5>" + place.name + "</h5>";
+       content += "<p>" + place.strap + "</p>";
+      
+       var mediaBody = $("<div class='media-body'></div>");
+       mediaBody.html(content);
+       var media = $("<div class='media'/>");
+      
+       media.append(mediaLeft);
+       media.append(mediaBody);
+       info.append(media);
+       return info.prop('outerHTML');
 }
 
 // Converts numeric degrees to radians
@@ -126,6 +146,7 @@ function addResult(directions, place){
     resultText += secondsToTime(duration) + " &ndash; "
     resultText  += " (" + Math.round(distance * METERS_TO_MILES) + " miles)";
     directRouteDuration = duration;
+    maxDurationDiff = Math.round((0.2 * directRouteDuration) + (0.4 * 3600));
   }
   
   var result = $("<li class='list-group-item'>" + resultText + "</li>");
@@ -138,21 +159,20 @@ function addResult(directions, place){
     directionsDisplay.setOptions({markerOptions: {zIndex: google.maps.Marker.MAX_ZINDEX + 1}})
     directionsDisplay.setDirections(directions);
   });
-  
-  
+    
   // Direct route
   if (place == null){
     $('#results').append(result);
   }
   // Don't add more than a third of the journey time
-  else if (place && (durationDiff <= (directRouteDuration/3))){
+  else if (place && durationDiff <= maxDurationDiff){
     var marker = new google.maps.Marker({
       position: new google.maps.LatLng(place.la, place.lo),
       map: map,
       title: place.name
     });
     google.maps.event.addListener(marker, 'click', function() {
-      infoWindow.setContent(place.name);
+      infoWindow.setContent(infoWindowContent(place));
       infoWindow.open(map,marker);
     });
     allMarkers.push(marker);
@@ -191,6 +211,29 @@ function secondsToTime(secs, long)
 }
 
 function initialize() {
+  // Start loading data first
+  $.getJSON('./data/all.json', function(data){
+    allProperties = data;
+    
+  })
+  
+  // setTimeout(function(){
+  //
+  //   var place = allProperties.results[0];
+  //   var marker = new google.maps.Marker({
+  //     position: new google.maps.LatLng(place.la, place.lo),
+  //     map: map,
+  //     title: place.name
+  //   });
+  //   google.maps.event.addListener(marker, 'click', function() {
+  //     var info = infoWindowContent(place);
+  //     infoWindow.setContent(info.prop('outerHTML'));
+  //     infoWindow.open(map,marker);
+  //   });
+  //
+  //
+  // }, 500)
+  
   var mapOptions = {
     center: new google.maps.LatLng(54.96175206818404,-4.454484374999992),
     streetViewControl: false,
@@ -218,10 +261,6 @@ function initialize() {
   google.maps.event.addListener(autocompleteEnd, 'place_changed', function() {
     endLocation = autocompleteEnd.getPlace();
   });
-  
-  $.getJSON('./data/all.json', function(data){
-    allProperties = data;
-  })
   
   $('.search-form a').click(function(e){
     e.preventDefault();

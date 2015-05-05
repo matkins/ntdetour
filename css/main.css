@@ -42,3 +42,8 @@ li {
 .search-form label {
   font-weight: normal;
 }
+
+#infowindow {
+  padding:20px;
+  max-width:400px;
+}
