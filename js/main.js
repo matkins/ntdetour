@@ -2,7 +2,7 @@ var METERS_TO_MILES = 0.000621371192;
 
 var directionsService = new google.maps.DirectionsService();
 var directionsDisplay = new google.maps.DirectionsRenderer();
-var map, startLocation, endLocation, directRouteDuration;
+var map, startLocation, endLocation, directRouteDuration, infoWindow;
 var directionsCtr = 0;
 var potentialPlaces = [];
 var numPotentialPlaces = 0;
@@ -30,29 +30,29 @@ function midPoint(point1, point2){
 }
 
 function distanceBetween(point1, point2) 
- {
-   var lat1 = point1.lat();
-   var lon1 = point1.lng();
-   var lat2 = point2.lat();
-   var lon2 = point2.lng();
+{
+  var lat1 = point1.lat();
+  var lon1 = point1.lng();
+  var lat2 = point2.lat();
+  var lon2 = point2.lng();
  
-   var R = 6371; // km
-   var dLat = toRad(lat2-lat1);
-   var dLon = toRad(lon2-lon1);
-   var lat1 = toRad(lat1);
-   var lat2 = toRad(lat2);
+  var R = 6371; // km
+  var dLat = toRad(lat2-lat1);
+  var dLon = toRad(lon2-lon1);
+  var lat1 = toRad(lat1);
+  var lat2 = toRad(lat2);
 
-   var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-     Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
-   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-   var d = R * c;
-   return d;
- }
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+  Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c;
+  return d;
+}
 
 // Converts numeric degrees to radians
 function toRad(val) 
 {
-   return val * Math.PI / 180;
+  return val * Math.PI / 180;
 }
 
 function toDeg(val){
@@ -139,18 +139,25 @@ function addResult(directions, place){
     directionsDisplay.setDirections(directions);
   });
   
+  
+  // Direct route
+  if (place == null){
+    $('#results').append(result);
+  }
   // Don't add more than a third of the journey time
-  if(place && (durationDiff <= (directRouteDuration/3))){
+  else if (place && (durationDiff <= (directRouteDuration/3))){
     var marker = new google.maps.Marker({
-         position: new google.maps.LatLng(place.la, place.lo),
-         map: map,
-         title: place.name
-     });
-     allMarkers.push(marker);
-     $('#results').append(result);
-   } else if (place == null){
-     $('#results').append(result);
-   }
+      position: new google.maps.LatLng(place.la, place.lo),
+      map: map,
+      title: place.name
+    });
+    google.maps.event.addListener(marker, 'click', function() {
+      infoWindow.setContent(place.name);
+      infoWindow.open(map,marker);
+    });
+    allMarkers.push(marker);
+    $('#results').append(result);
+  }
 
   // Sort by extra duration
   $('#results').find("li").detach().sort(function(a, b) {
@@ -161,11 +168,11 @@ function addResult(directions, place){
   
   // Sort by leg ratio
   // $('#results').find("li").detach().sort(function(a, b) {
-  //   return($(b).data('leg-ratio') - $(a).data('leg-ratio'));
-  // }).each(function(index, el) {
-  //   $('#results').append(el);
-  // });
-}
+    //   return($(b).data('leg-ratio') - $(a).data('leg-ratio'));
+    // }).each(function(index, el) {
+      //   $('#results').append(el);
+      // });
+    }
 
 function secondsToTime(secs, long)
 {
@@ -193,6 +200,7 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
   mapOptions);
+  infoWindow = new google.maps.InfoWindow();
   directionsDisplay.setMap(map);
     
   // Start input
