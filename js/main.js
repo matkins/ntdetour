@@ -107,7 +107,7 @@ function getDirections(callback){
         $('.progress-bar').css('width', "" + progress * 100 + "%");
         addResult(response, place);
         if(potentialPlaces.length > 0){
-          setTimeout(function(){getDirections(callback)}, 120);
+          setTimeout(function(){getDirections(callback)}, 500);
         } else {
           $('.progress').hide();
           if (callback){
@@ -116,7 +116,7 @@ function getDirections(callback){
         }
       } else if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
         console.log('OVER_QUERY_LIMIT');
-        setTimeout(function(){getDirections(callback)}, 1200);
+        setTimeout(function(){getDirections(callback)}, 1000);
       }
     });
   } else {
