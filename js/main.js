@@ -274,8 +274,10 @@ function initialize() {
         allMarkers[i].setMap(null);
       }
       
-      new google.maps.Marker({ position: startLocation.geometry.location, map: map, title: startLocation.name });
-      new google.maps.Marker({ position: endLocation.geometry.location, map: map, title: endLocation.name });
+      var startMarker = new google.maps.Marker({ position: startLocation.geometry.location, map: map, title: startLocation.name });
+      var endMarker = new google.maps.Marker({ position: endLocation.geometry.location, map: map, title: endLocation.name });
+      allMarkers.push(startMarker);
+      allMarkers.push(endMarker);
       
       var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
       var crowFliesDist = distanceBetween(startLocation.geometry.location, endLocation.geometry.location);
