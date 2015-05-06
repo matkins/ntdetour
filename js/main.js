@@ -52,6 +52,8 @@ function distanceBetween(point1, point2)
 
 function showInfoWindow(place, directions, marker){
   
+  infoWindow.close();
+  
   var info = $("<div id='infowindow'></div>");
       
   var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
