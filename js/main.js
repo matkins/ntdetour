@@ -50,27 +50,28 @@ function distanceBetween(point1, point2)
 }
 
 
-function infoWindowContent(place, directions){
+function showInfoWindow(place, directions, marker){
+  
   var info = $("<div id='infowindow'></div>");
       
   var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
       
   var content = ""
   content += "<h4>" + place.name + "</h4>";
-  content += "<p>" + place.strap + "</p>";
-  
-  content += "<p>" + startLocation.name + " to " + place.name  + ": " + directions.routes[0].legs[0].duration.text + "</p>";
-  content += "<p>" + endLocation.name + " to " + place.name  + ": " + directions.routes[0].legs[1].duration.text + "</p>";
-  
+  content += "<p><em>" + place.strap + "</em></p>";
+  content += "<p>" + startLocation.name + " to " + place.name  + ": <strong>" + directions.routes[0].legs[0].duration.text + "</strong></p>";
+  content += "<p>" + place.name + " to " + endLocation.name + ": <strong>" + directions.routes[0].legs[1].duration.text + "</strong></p>";
       
   var mediaBody = $("<div class='media-body'></div>");
   mediaBody.html(content);
   var media = $("<div class='media'/>");
-      
+  
   media.append(mediaLeft);
   media.append(mediaBody);
   info.append(media);
-  return info.prop('outerHTML');
+  
+  infoWindow.setContent(info.prop('outerHTML'));
+  infoWindow.open(map,marker);
 }
 
 // Converts numeric degrees to radians
@@ -159,29 +160,37 @@ function addResult(directions, place){
   }
   result.data('leg-ratio', legRatio);
   result.data('duration',duration);
-  result.on('click', function(){
-    directionsDisplay.setOptions({markerOptions: {zIndex: google.maps.Marker.MAX_ZINDEX + 1}})
-    directionsDisplay.setDirections(directions);
-  });
-    
+  
+  var marker;
+  
   // Direct route
   if (place == null){
     $('#results').append(result);
   }
   // Don't add more than a third of the journey time
   else if (place && durationDiff <= maxDurationDiff){
-    var marker = new google.maps.Marker({
+    marker = new google.maps.Marker({
       position: new google.maps.LatLng(place.la, place.lo),
       map: map,
       title: place.name
     });
     google.maps.event.addListener(marker, 'click', function() {
-      infoWindow.setContent(infoWindowContent(place,directions));
-      infoWindow.open(map,marker);
+      showInfoWindow(place, directions, marker);
     });
     allMarkers.push(marker);
     $('#results').append(result);
   }
+  
+  
+  result.on('click', function(){
+    directionsDisplay.setOptions({markerOptions: {zIndex: google.maps.Marker.MAX_ZINDEX + 1}})
+    directionsDisplay.setDirections(directions);
+    if(place && marker){
+      showInfoWindow(place, directions, marker); 
+    }
+  });
+    
+  
 
   // Sort by extra duration
   $('#results').find("li").detach().sort(function(a, b) {
