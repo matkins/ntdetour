@@ -63,7 +63,7 @@ function showInfoWindow(place, directions, marker){
   content += "<p><em>" + place.strap + "</em></p>";
   content += "<p>" + startLocation.name + " to " + place.name  + ": <strong>" + directions.routes[0].legs[0].duration.text + "</strong>";
   content += "<br>" + place.name + " to " + endLocation.name + ": <strong>" + directions.routes[0].legs[1].duration.text + "</strong></p>";
-  content += "<a href='" + place.sc + "' target='_blank'>More information</a>";
+  content += "<a href='" + place.sc + "' target='_blank'>More information and opening times</a>";
       
   var mediaBody = $("<div class='media-body'></div>");
   mediaBody.html(content);
