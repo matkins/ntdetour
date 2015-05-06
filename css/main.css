@@ -3,6 +3,11 @@ html, body{
   margin: 0px;
   padding: 0px
 }
+
+.navbar-header {
+  width:100%;
+  position:relative;
+}
 #map-canvas {
   height:520px;
   width:100%;
@@ -34,6 +39,10 @@ li {
 }
 .progress {
   display:none;
+  position:absolute;
+  right:0px;
+  width: 360px;
+  top: 15px;
 }
 .search-form {
   margin:10px 0px;
