@@ -50,23 +50,27 @@ function distanceBetween(point1, point2)
 }
 
 
-function infoWindowContent(place){
+function infoWindowContent(place, directions){
   var info = $("<div id='infowindow'></div>");
       
-       var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
+  var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
       
-       var content = ""
-       content += "<h5>" + place.name + "</h5>";
-       content += "<p>" + place.strap + "</p>";
+  var content = ""
+  content += "<h4>" + place.name + "</h4>";
+  content += "<p>" + place.strap + "</p>";
+  
+  content += "<p>" + startLocation.name + " to " + place.name  + ": " + directions.routes[0].legs[0].duration.text + "</p>";
+  content += "<p>" + endLocation.name + " to " + place.name  + ": " + directions.routes[0].legs[1].duration.text + "</p>";
+  
       
-       var mediaBody = $("<div class='media-body'></div>");
-       mediaBody.html(content);
-       var media = $("<div class='media'/>");
+  var mediaBody = $("<div class='media-body'></div>");
+  mediaBody.html(content);
+  var media = $("<div class='media'/>");
       
-       media.append(mediaLeft);
-       media.append(mediaBody);
-       info.append(media);
-       return info.prop('outerHTML');
+  media.append(mediaLeft);
+  media.append(mediaBody);
+  info.append(media);
+  return info.prop('outerHTML');
 }
 
 // Converts numeric degrees to radians
@@ -99,7 +103,7 @@ function getDirections(callback){
         $('.progress-bar').css('width', "" + progress * 100 + "%");
         addResult(response, place);
         if(potentialPlaces.length > 0){
-          setTimeout(function(){getDirections(callback)}, 400);
+          setTimeout(function(){getDirections(callback)}, 120);
         } else {
           $('.progress').hide();
           if (callback){
@@ -108,7 +112,7 @@ function getDirections(callback){
         }
       } else if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
         console.log('OVER_QUERY_LIMIT');
-        setTimeout(function(){getDirections(callback)}, 2500);
+        setTimeout(function(){getDirections(callback)}, 1200);
       }
     });
   } else {
@@ -172,7 +176,7 @@ function addResult(directions, place){
       title: place.name
     });
     google.maps.event.addListener(marker, 'click', function() {
-      infoWindow.setContent(infoWindowContent(place));
+      infoWindow.setContent(infoWindowContent(place,directions));
       infoWindow.open(map,marker);
     });
     allMarkers.push(marker);
@@ -248,7 +252,7 @@ function initialize() {
     
   // Start input
   var startInput = document.getElementById('start-input');
-  var autocompleteStart = new google.maps.places.Autocomplete(startInput);
+  var autocompleteStart = new google.maps.places.Autocomplete(startInput, {bounds: map.getBounds()});
   autocompleteStart.bindTo('bounds', map);
   google.maps.event.addListener(autocompleteStart, 'place_changed', function() {
     startLocation = autocompleteStart.getPlace();
@@ -256,7 +260,7 @@ function initialize() {
     
   // End input
   var endInput = document.getElementById('end-input');
-  var autocompleteEnd = new google.maps.places.Autocomplete(endInput);
+  var autocompleteEnd = new google.maps.places.Autocomplete(endInput, {bounds: map.getBounds()});
   autocompleteEnd.bindTo('bounds', map);
   google.maps.event.addListener(autocompleteEnd, 'place_changed', function() {
     endLocation = autocompleteEnd.getPlace();

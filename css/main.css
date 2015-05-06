@@ -44,6 +44,13 @@ li {
 }
 
 #infowindow {
-  padding:20px;
+  padding-top:8px;
   max-width:400px;
+}
+#infowindow img{
+  max-width:120px;
+}
+#infowindow h4 {
+  margin-top:0px;
+  margin-bottom:7px;
 }
