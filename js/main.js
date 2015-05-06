@@ -53,27 +53,25 @@ function distanceBetween(point1, point2)
 function showInfoWindow(place, directions, marker){
   
   infoWindow.close();
-  
-  var info = $("<div id='infowindow'></div>");
       
   var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
       
-  var content = ""
-  content += "<h4>" + place.name + "</h4>";
-  content += "<p><em>" + place.strap + "</em></p>";
-  content += "<p>" + startLocation.name + " to here: <strong>" + directions.routes[0].legs[0].duration.text + "</strong>";
-  content += "<br>Here to " + endLocation.name + ": <strong>" + directions.routes[0].legs[1].duration.text + "</strong></p>";
-  content += "<a href='" + place.sc + "' target='_blank'>More information and opening times</a>";
-      
-  var mediaBody = $("<div class='media-body'></div>");
-  mediaBody.html(content);
-  var media = $("<div class='media'/>");
+  var mediaBody = "<div class='media-body'>";
+  mediaBody += "<h4>" + place.name + "</h4>";
+  mediaBody += "<p><em>" + place.strap + "</em></p>";
+  mediaBody += "<p>" + startLocation.name + " to here: <strong>" + directions.routes[0].legs[0].duration.text + "</strong>";
+  mediaBody += "<br>Here to " + endLocation.name + ": <strong>" + directions.routes[0].legs[1].duration.text + "</strong></p>";
+  mediaBody += "<a href='" + place.sc + "' target='_blank'>More information and opening times</a>";
+  mediaBody += "</div>";
   
-  media.append(mediaLeft);
-  media.append(mediaBody);
-  info.append(media);
+  var media = "<div class='media'>";
+  media += mediaLeft + mediaBody;
+  media += "</div>";
   
-  infoWindow.setContent(info.prop('outerHTML'));
+  var content = "<div id='infowindow'>";
+  content += media;
+  content += "</div>";
+  infoWindow.setContent(content);
   infoWindow.open(map,marker);
 }
 

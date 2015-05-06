@@ -1,3 +1,25 @@
+#main {
+  height:100%;
+  width:970px;
+  position:absolute;
+  top:0;
+  left:50%;
+  padding:76px 0px 70px;
+  margin-left:-485px;
+}
+nav {
+  z-index:1000;
+}
+.navbar-footer{
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 0px;
+  width: 100%;
+}
+.container {
+  width: 970px !important;
+  padding:0px;
+}
 html, body{
   height: 100%;
   margin: 0px;
@@ -5,11 +27,14 @@ html, body{
 }
 
 .navbar-header {
-  width:100%;
   position:relative;
+  width:100%;
 }
 #map-canvas {
-  height:520px;
+  position:absolute;
+  top:0;
+  left:0;
+  height:100%;
   width:100%;
 }
 
@@ -23,6 +48,13 @@ html, body{
   padding:6px 24px;
 }
 
+.form-inline .form-group,
+.form-inline .form-control {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
 .pac-input:focus {
   border-color: #4d90fe;
 } 
@@ -33,15 +65,27 @@ html, body{
 li {
   cursor:pointer;
 }
+.col-left {
+  width:60%;
+  float:left;
+  display:block;
+  height:100%;
+  position:relative;
+}
 .col-right {
-  height: 520px;
+  width:40%;
+  float:right;
+  display:block;
+  height:100%;
+  position:relative;
+  padding-left:20px;
   overflow-y:scroll;
 }
 .progress {
   display:none;
   position:absolute;
   right:0px;
-  width: 360px;
+  width: 230px;
   top: 15px;
 }
 .search-form {
@@ -54,7 +98,7 @@ li {
 
 #infowindow {
   padding-top:8px;
-  max-width:500px;
+  max-width:450px;
 }
 #infowindow img{
   max-width:120px;
@@ -62,4 +106,8 @@ li {
 #infowindow h4 {
   margin-top:0px;
   margin-bottom:7px;
+}
+footer {
+  text-align:center;
+  padding-top:14px;
 }
