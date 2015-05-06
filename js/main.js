@@ -1,7 +1,7 @@
 var METERS_TO_MILES = 0.000621371192;
 
 var directionsService = new google.maps.DirectionsService();
-var directionsDisplay = new google.maps.DirectionsRenderer();
+var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, suppressInfoWindows: true});
 var map, startLocation, endLocation, directRouteDuration, infoWindow, maxDurationDiff;
 var directionsCtr = 0;
 var potentialPlaces = [];
@@ -273,6 +273,10 @@ function initialize() {
       for (var i = 0; i < allMarkers.length; i++) {
         allMarkers[i].setMap(null);
       }
+      
+      new google.maps.Marker({ position: startLocation.geometry.location, map: map, title: startLocation.name });
+      new google.maps.Marker({ position: endLocation.geometry.location, map: map, title: endLocation.name });
+      
       var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
       var crowFliesDist = distanceBetween(startLocation.geometry.location, endLocation.geometry.location);
       potentialPlaces = [{place:null, totalDistance:crowFliesDist}];
