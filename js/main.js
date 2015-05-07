@@ -277,6 +277,14 @@ function initialize() {
   });
   
   $('.search-form a').click(function(e){
+    if($('#modal').length > 0){
+      $('#modal').hide();
+      var form = $('#modal .modal-body form').detach();
+      $('.navbar-header').prepend(form);
+      $('#modal').remove();
+    }
+    
+    
     e.preventDefault();
     if (startLocation && endLocation){
       $('#results').html('');
