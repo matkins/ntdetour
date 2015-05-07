@@ -6,7 +6,7 @@ var map, startLocation, endLocation, directRouteDuration, infoWindow, maxDuratio
 var directionsCtr = 0;
 var potentialPlaces = [];
 var numPotentialPlaces = 0;
-var allProperties = [];
+var allPlaces = [];
 var allMarkers = [];
 
 function midPoint(point1, point2){
@@ -51,8 +51,6 @@ function distanceBetween(point1, point2)
 
 
 function showInfoWindow(place, directions, marker){
-  
-  infoWindow.close();
       
   var mediaLeft = "<div class='media-left'><img class='media-object' src='http://www.nationaltrust.org.uk" + place.img + "'></div>";
       
@@ -176,6 +174,9 @@ function addResult(directions, place){
       title: place.name
     });
     google.maps.event.addListener(marker, 'click', function() {
+      directionsDisplay.setOptions({markerOptions: {zIndex: google.maps.Marker.MAX_ZINDEX + 1}})
+      directionsDisplay.setDirections(directions);
+      infoWindow.close();
       showInfoWindow(place, directions, marker);
     });
     allMarkers.push(marker);
@@ -186,6 +187,7 @@ function addResult(directions, place){
   result.on('click', function(){
     directionsDisplay.setOptions({markerOptions: {zIndex: google.maps.Marker.MAX_ZINDEX + 1}})
     directionsDisplay.setDirections(directions);
+    infoWindow.close();
     if(place && marker){
       showInfoWindow(place, directions, marker); 
     }
@@ -224,30 +226,7 @@ function secondsToTime(secs, long)
     return out;
 }
 
-function initialize() {
-  // Start loading data first
-  $.getJSON('./data/all.json', function(data){
-    allProperties = data;
-    
-  })
-  
-  // setTimeout(function(){
-  //
-  //   var place = allProperties.results[0];
-  //   var marker = new google.maps.Marker({
-  //     position: new google.maps.LatLng(place.la, place.lo),
-  //     map: map,
-  //     title: place.name
-  //   });
-  //   google.maps.event.addListener(marker, 'click', function() {
-  //     var info = infoWindowContent(place);
-  //     infoWindow.setContent(info.prop('outerHTML'));
-  //     infoWindow.open(map,marker);
-  //   });
-  //
-  //
-  // }, 500)
-  
+function initMap(){
   var mapOptions = {
     center: new google.maps.LatLng(54.96175206818404,-4.454484374999992),
     streetViewControl: false,
@@ -255,83 +234,94 @@ function initialize() {
     mapTypeControl: false,
     zoom: 5
   };
-  map = new google.maps.Map(document.getElementById('map-canvas'),
-  mapOptions);
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
   infoWindow = new google.maps.InfoWindow();
   directionsDisplay.setMap(map);
+}
+
+function performSearch(){
+  if($('#welcome').length > 0){
+    $('#welcome').hide();
+    var form = $('#welcome form').detach();
+    $('.navbar-header').prepend(form);
+    $('#welcome').remove();
+    $('body').removeClass('welcome');
+    google.maps.event.trigger(map,'resize');
+  }
+  
+  if (startLocation && endLocation){
+    $('#results').html('');
+    for (var i = 0; i < allMarkers.length; i++) {
+      allMarkers[i].setMap(null);
+    }
     
+    var startMarker = new google.maps.Marker({ position: startLocation.geometry.location, map: map, title: startLocation.name });
+    var endMarker = new google.maps.Marker({ position: endLocation.geometry.location, map: map, title: endLocation.name });
+    allMarkers.push(startMarker);
+    allMarkers.push(endMarker);
+    
+    var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
+    var crowFliesDist = distanceBetween(startLocation.geometry.location, endLocation.geometry.location);
+    potentialPlaces = [{place:null, totalDistance:crowFliesDist}];
+    
+    // Get most direct route without stop
+    getDirections(function(directDirections){
+      directionsDisplay.setDirections(directDirections);
+
+      allPlaces.results.forEach(function(place){
+        var placeLatLng = new google.maps.LatLng(place.la, place.lo);
+
+        var distFromMid = distanceBetween(placeLatLng, mid);
+        var inTheCircle = distFromMid < (crowFliesDist/2);
+        
+        var distanceFromStart = distanceBetween(startLocation.geometry.location, placeLatLng);
+        var distanceFromEnd = distanceBetween(endLocation.geometry.location, placeLatLng);
+        var totalDistance = distanceFromStart + distanceFromEnd;
+        var notTooMuchExtraMileage = totalDistance < (crowFliesDist * 1.2);
+        
+        var tooCloseToEitherEnd = (distanceFromEnd < (crowFliesDist/3)) || (distanceFromStart < (crowFliesDist/3))
+        
+        if (inTheCircle && notTooMuchExtraMileage && !tooCloseToEitherEnd){
+          potentialPlaces.push({place: place, totalDistance: totalDistance, distanceFromMid: distFromMid});
+        }
+      });
+      potentialPlaces.sort(function(a,b){
+        return a.distanceFromMid - b.distanceFromMid;
+      });
+      numPotentialPlaces = potentialPlaces.length;
+      $('.progress-bar').css('width', '0%');
+      $('.progress').show();
+      getDirections();
+    })
+  }
+}
+
+
+$('document').ready(function(){
+
+  // Start loading data first
+  $.getJSON('./data/all.json', function(data){
+    allPlaces = data;
+  })
+  
+  initMap();
+      
   // Start input
   var startInput = document.getElementById('start-input');
-  var autocompleteStart = new google.maps.places.Autocomplete(startInput, {bounds: map.getBounds()});
-  autocompleteStart.bindTo('bounds', map);
+  var autocompleteStart = new google.maps.places.Autocomplete(startInput, {componentRestrictions: {country: 'gb'}});
   google.maps.event.addListener(autocompleteStart, 'place_changed', function() {
     startLocation = autocompleteStart.getPlace();
   });
     
   // End input
   var endInput = document.getElementById('end-input');
-  var autocompleteEnd = new google.maps.places.Autocomplete(endInput, {bounds: map.getBounds()});
-  autocompleteEnd.bindTo('bounds', map);
+  var autocompleteEnd = new google.maps.places.Autocomplete(endInput,  {componentRestrictions: {country: 'gb'}});
   google.maps.event.addListener(autocompleteEnd, 'place_changed', function() {
     endLocation = autocompleteEnd.getPlace();
   });
   
   $('.search-form a').click(function(e){
-    if($('#modal').length > 0){
-      $('#modal').hide();
-      var form = $('#modal .modal-body form').detach();
-      $('.navbar-header').prepend(form);
-      $('#modal').remove();
-    }
-    
-    
     e.preventDefault();
-    if (startLocation && endLocation){
-      $('#results').html('');
-      for (var i = 0; i < allMarkers.length; i++) {
-        allMarkers[i].setMap(null);
-      }
-      
-      var startMarker = new google.maps.Marker({ position: startLocation.geometry.location, map: map, title: startLocation.name });
-      var endMarker = new google.maps.Marker({ position: endLocation.geometry.location, map: map, title: endLocation.name });
-      allMarkers.push(startMarker);
-      allMarkers.push(endMarker);
-      
-      var mid = midPoint(startLocation.geometry.location, endLocation.geometry.location);
-      var crowFliesDist = distanceBetween(startLocation.geometry.location, endLocation.geometry.location);
-      potentialPlaces = [{place:null, totalDistance:crowFliesDist}];
-      
-      // Get most direct route without stop
-      getDirections(function(directDirections){
-        directionsDisplay.setDirections(directDirections);
-
-        allProperties.results.forEach(function(place){
-          var placeLatLng = new google.maps.LatLng(place.la, place.lo);
-
-          var distFromMid = distanceBetween(placeLatLng, mid);
-          var inTheCircle = distFromMid < (crowFliesDist/2);
-          
-          var distanceFromStart = distanceBetween(startLocation.geometry.location, placeLatLng);
-          var distanceFromEnd = distanceBetween(endLocation.geometry.location, placeLatLng);
-          var totalDistance = distanceFromStart + distanceFromEnd;
-          var notTooMuchExtraMileage = totalDistance < (crowFliesDist * 1.2);
-          
-          var tooCloseToEitherEnd = (distanceFromEnd < (crowFliesDist/3)) || (distanceFromStart < (crowFliesDist/3))
-          
-          if (inTheCircle && notTooMuchExtraMileage && !tooCloseToEitherEnd){
-            potentialPlaces.push({place: place, totalDistance: totalDistance, distanceFromMid: distFromMid});
-          }
-        });
-        potentialPlaces.sort(function(a,b){
-          return a.distanceFromMid - b.distanceFromMid;
-        });
-        numPotentialPlaces = potentialPlaces.length;
-        $('.progress-bar').css('width', '0%');
-        $('.progress').show();
-        getDirections();
-      })
-    }
+    performSearch();
   });
-}
-
-google.maps.event.addDomListener(window, 'load', initialize);
+});

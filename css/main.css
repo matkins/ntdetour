@@ -96,6 +96,12 @@ li {
   font-weight: normal;
 }
 
+.welcome nav,
+.welcome #main {
+  display:none;
+}
+
+
 #infowindow {
   padding-top:8px;
   max-width:450px;
@@ -110,4 +116,11 @@ li {
 footer {
   text-align:center;
   padding-top:14px;
+}
+
+#welcome {
+  position:relative;
+  z-index:1000;
+  width:50%;
+  margin:150px auto 0;
 }
