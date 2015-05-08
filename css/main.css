@@ -1,14 +1,31 @@
+.container {
+  width:970px !important;
+}
 #main {
   height:100%;
   width:970px;
   position:absolute;
   top:0;
-  left:50%;
   padding:76px 0px 70px;
-  margin-left:-485px;
+}
+@media (min-width: 970px) {
+  #main {
+    position:absolute;
+    left:50%;
+    margin-left:-485px;
+  }
 }
 nav {
   z-index:1000;
+}
+a {
+  color: #02749c;
+}
+.navbar-top {
+ background:#f4f4f4; 
+}
+.navbar-top .container {
+  padding:0px;
 }
 .navbar-footer{
   position: absolute;
@@ -16,11 +33,7 @@ nav {
   margin-bottom: 0px;
   width: 100%;
 }
-.container {
-  width: 970px !important;
-  padding:0px;
-}
-html, body{
+body{
   height: 100%;
   margin: 0px;
   padding: 0px
@@ -38,18 +51,18 @@ html, body{
   width:100%;
 }
 
-.form-inline .pac-input {
+nav form .pac-input {
   text-overflow: ellipsis;
   width: 224px;
 }
 
-.form-inline a {
+nav form a {
   margin-left: 10px;
   padding:6px 24px;
 }
 
-.form-inline .form-group,
-.form-inline .form-control {
+nav form .form-group,
+nav form .form-control {
   display: inline-block;
   margin-bottom: 0;
   vertical-align: middle;
@@ -58,10 +71,6 @@ html, body{
 .pac-input:focus {
   border-color: #4d90fe;
 } 
-
-.pac-container {
-  font-family: Roboto;
-}
 li {
   cursor:pointer;
 }
@@ -85,8 +94,8 @@ li {
   display:none;
   position:absolute;
   right:0px;
-  width: 230px;
-  top: 15px;
+  width: 250px;
+  top: 19px;
 }
 .search-form {
   margin:10px 0px;
@@ -95,12 +104,40 @@ li {
 .search-form label {
   font-weight: normal;
 }
-
+.welcome {
+  background:#f4f4f4;
+}
 .welcome nav,
 .welcome #main {
   display:none;
 }
 
+.welcome .search-form label {
+  font-size:18px;
+  margin-bottom:10px;
+}
+.welcome .form-group {
+  margin-bottom:5px;
+}
+.welcome .btn {
+  margin-top:15px;
+  padding: 14px 26px;
+  font-size: 17px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+}
+
+.welcome .form-control {
+  font-size:15px;
+}
+
+.well {
+  background:white;
+}
+.jumbotron p {
+  margin-bottom: 5px;
+  line-height: 1.6;
+}
 
 #infowindow {
   padding-top:8px;
@@ -115,12 +152,14 @@ li {
 }
 footer {
   text-align:center;
-  padding-top:14px;
+  padding:15px;
 }
 
 #welcome {
-  position:relative;
-  z-index:1000;
-  width:50%;
-  margin:150px auto 0;
+  margin-top:10%;
 }
+
+.form-control::-webkit-input-placeholder { color: #999; }
+.form-control:-moz-placeholder { color: #999; }
+.form-control::-moz-placeholder { color: #999; }
+.form-control:-ms-input-placeholder { color: #999; }

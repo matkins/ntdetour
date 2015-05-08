@@ -1,11 +1,11 @@
 ---
 layout: default
 ---
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default navbar-top">
   <div class="container">
     <div class="navbar-header">
       <div class="progress">
-        <div class="progress-bar" role="progressbar" style="width: 0%;">
+        <div class="progress-bar progress-bar-info" role="progressbar" style="width: 0%;">
         </div>
       </div>
     </div>
@@ -22,23 +22,38 @@ layout: default
 </div>
 <nav class="navbar navbar-default navbar-footer">
   <div class="container">
-    <footer>Made by <a href='https://twitter.com/matkins' target='_blank'>Matt Atkins</a></footer>
+    <footer>
+      Made by <a href='https://twitter.com/matkins' target='_blank'>Matt Atkins</a>
+      &mdash;
+      This site has no official link with the National Trust, but I hope they'll like it
+    </footer>
   </div>
 </nav>
-<div id='welcome' class="jumbotron text-center well">
-  <h2 class='text-center'>National Trust Detour Planner</h2>
-  <p class='lead'>
-    Going on a journey? Looking for somewhere to stop along the way?
-  </p>
-  <form class='form-inline search-form'>
-    <div class="form-group">
-      <label>Find a place between</label>
-      <input id="start-input" class="form-control pac-input" type="text" placeholder="start location">
+<div id='welcome' class='container'>
+  <div class='row'>
+    <div class='col-md-8 col-md-offset-2'>
+      <div class="jumbotron text-center well">
+        <h2 class='text-center'>National Trust Detour Planner</h2>
+        <p>
+          Going on a journey?<br>
+          Looking for somewhere to stop along the way?
+        </p>
+        <div class='row'>
+          <div class='col-sm-8 col-sm-offset-2'>
+            <form class='search-form'>
+              <div class="form-group">
+                <label>Find a place between</label>
+                <input id="start-input" class="form-control pac-input" type="text" placeholder="start location">
+              </div>
+              <div class="form-group">
+                <label>and</label>
+                <input id="end-input" class="form-control pac-input" type="text" placeholder="end location">
+              </div>
+              <a href="#" class='btn btn-info'>Search</a>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>and</label>
-      <input id="end-input" class="form-control pac-input" type="text" placeholder="end location">
-    </div>
-    <a href="#" class='btn btn-primary'>Search</a>
-  </form>
+  </div>
 </div>

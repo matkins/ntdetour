@@ -144,11 +144,10 @@ function addResult(directions, place){
   if(place){
     durationDiff = duration - directRouteDuration;
     resultText += "<strong>" + place.name + "</strong><br>";
-    resultText += secondsToTime(durationDiff, true) + " longer"
+    resultText += secondsToTime(durationDiff) + " longer"
   } else {
-    resultText += "<strong>" + "Direct route" + "</strong> &ndash; ";
-    resultText += secondsToTime(duration) + " &ndash; "
-    resultText  += " (" + Math.round(distance * METERS_TO_MILES) + " miles)";
+    resultText += "<strong>" + "Direct route" + "</strong><br>";
+    resultText += secondsToTime(duration);
     directRouteDuration = duration;
     maxDurationDiff = Math.round((0.2 * directRouteDuration) + (0.4 * 3600));
   }
@@ -210,7 +209,7 @@ function addResult(directions, place){
       // });
     }
 
-function secondsToTime(secs, long)
+function secondsToTime(secs)
 {
     var hours = Math.floor(secs / (60 * 60));
     var divisor_for_minutes = secs % (60 * 60);
@@ -219,10 +218,10 @@ function secondsToTime(secs, long)
     var out = "";
     if(hours > 0){
       out += hours;
-      out += long ? (hours == 1 ? " hour " : " hours ") : "hr ";
+      out += hours == 1 ? " hour " : " hours ";
     }
     out += minutes;
-    out += long ? (minutes == 1 ? " minute " : " minutes ") : "min ";
+    out += minutes == 1 ? " minute " : " minutes ";
     return out;
 }
 
@@ -240,16 +239,16 @@ function initMap(){
 }
 
 function performSearch(){
-  if($('#welcome').length > 0){
-    $('#welcome').hide();
-    var form = $('#welcome form').detach();
-    $('.navbar-header').prepend(form);
-    $('#welcome').remove();
-    $('body').removeClass('welcome');
-    google.maps.event.trigger(map,'resize');
-  }
-  
   if (startLocation && endLocation){
+    if($('#welcome').length > 0){
+      $('#welcome').hide();
+      var form = $('#welcome form').detach();
+      $('.navbar-header').prepend(form);
+      $('#welcome').remove();
+      $('body').removeClass('welcome');
+      initMap();
+    }
+    
     $('#results').html('');
     for (var i = 0; i < allMarkers.length; i++) {
       allMarkers[i].setMap(null);
@@ -303,8 +302,6 @@ $('document').ready(function(){
   $.getJSON('./data/all.json', function(data){
     allPlaces = data;
   })
-  
-  initMap();
       
   // Start input
   var startInput = document.getElementById('start-input');
