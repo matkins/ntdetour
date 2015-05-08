@@ -170,11 +170,11 @@ footer {
   z-index:1;
   left:50%;
   bottom:5px;
-  margin-left:-10px;
-  background:#02749c;
+  margin-left:-20px;
+  background:#3a87ad;
   width:40px;
   height:40px;
-  padding:15px 7.5px;
+  padding:16px 10px;
   border-radius:50%;
   font-size:0.5em;
   display:block;
@@ -187,7 +187,7 @@ footer {
   width: 0px;
   height: 0px;
   border-style: solid;
-  border-width: 2em 2em 0 2em;
+  border-width: 10px 10px 0px 10px;
   border-color: #ffffff transparent transparent transparent;
   -webkit-transform:rotate(360deg);/* added for better anti-aliasing on webkit browsers */
 }
@@ -201,6 +201,6 @@ footer {
   height: 0px;
   border-style: solid;
   border-width: 2em 2em 0 2em;
-  border-color: #02749c transparent transparent transparent;
+  border-color: #3a87ad transparent transparent transparent;
   -webkit-transform:rotate(360deg);/* added for better anti-aliasing on webkit browsers */
 }
