@@ -16,16 +16,18 @@ layout: default
     <div id="map-canvas"></div>
   </div>
   <div class='col-right'>
-    <ul id="results" class="list-group">
-    </ul>
+    <ul id="results" class="list-group"></ul>
+    <div class="arrow-wrap">
+      <span class="arrow"></span>
+    </div>
   </div>
 </div>
 <nav class="navbar navbar-default navbar-footer">
   <div class="container">
     <footer>
       Made by <a href='https://twitter.com/matkins' target='_blank'>Matt Atkins</a>
-      &mdash;
-      This site has no official link with the National Trust, but I hope they'll like it
+      &ndash;
+      no official link with the National Trust
     </footer>
   </div>
 </nav>
@@ -43,11 +45,11 @@ layout: default
             <form class='search-form'>
               <div class="form-group">
                 <label>Find a place between</label>
-                <input id="start-input" class="form-control pac-input" type="text" placeholder="start location">
+                <input id="start-input" class="form-control pac-input" type="text" placeholder="e.g. Sheffield">
               </div>
               <div class="form-group">
                 <label>and</label>
-                <input id="end-input" class="form-control pac-input" type="text" placeholder="end location">
+                <input id="end-input" class="form-control pac-input" type="text" placeholder="e.g. Birmingham">
               </div>
               <a href="#" class='btn btn-info'>Search</a>
             </form>
