@@ -6,6 +6,7 @@ var map, startLocation, endLocation, directRouteDuration, infoWindow, maxDuratio
 var directionsCtr = 0;
 var potentialPlaces = [];
 var numPotentialPlaces = 0;
+var numMatchingResults = 0;
 var allPlaces = [];
 var allMarkers = [];
 
@@ -167,6 +168,7 @@ function addResult(directions, place){
   }
   // Don't add more than a third of the journey time
   else if (place && durationDiff <= maxDurationDiff){
+    numMatchingResults++;
     marker = new google.maps.Marker({
       position: new google.maps.LatLng(place.la, place.lo),
       map: map,
@@ -251,11 +253,12 @@ function performSearch(){
     }
     
     $('#results').html('');
+    numMatchingResults = 0;
     $('.arrow-wrap').hide();
     for (var i = 0; i < allMarkers.length; i++) {
       allMarkers[i].setMap(null);
     }
-    
+        
     var startMarker = new google.maps.Marker({ position: startLocation.geometry.location, map: map, title: startLocation.name });
     var endMarker = new google.maps.Marker({ position: endLocation.geometry.location, map: map, title: endLocation.name });
     allMarkers.push(startMarker);
@@ -292,7 +295,9 @@ function performSearch(){
       numPotentialPlaces = potentialPlaces.length;
       $('.progress-bar').css('width', '0%');
       $('.progress').show();
-      getDirections();
+      getDirections(function(){
+        ga('send', 'event', 'form', 'search', '' + startLocation.name + ',' + endLocation.name, numMatchingResults);
+      });
     })
   }
 }
