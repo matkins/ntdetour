@@ -64,7 +64,8 @@ function showInfoWindow(place, directions, marker){
   mediaBody += "</div>";
   
   var media = "<div class='media'>";
-  media += mediaLeft + mediaBody;
+  //media += mediaLeft + mediaBody;
+  media += mediaBody;
   media += "</div>";
   
   var content = "<div id='infowindow'>";
